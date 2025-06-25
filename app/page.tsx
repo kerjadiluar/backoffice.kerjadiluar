@@ -1,4 +1,6 @@
 import React from "react";
+import './globals.css';
+
 
 export default function LandingPage() {
   return (
@@ -8,7 +10,7 @@ export default function LandingPage() {
           <h1 className="text-4xl font-bold mb-4">Selamat Datang</h1>
           <p className="text-xl mb-8">Sistem Backoffice Kejadiluar</p>
           <div className="space-x-4">
-            <a 
+            <a
               href="/login" 
               className="bg-white text-red-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition"
             >
