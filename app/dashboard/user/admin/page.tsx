@@ -1,162 +1,534 @@
 "use client"
 
-import type React from "react"
-
 import { useState, useEffect } from "react"
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import type { User } from "@/lib/types"
+import { FaUserShield, FaUsers, FaKey, FaCrown, FaEdit, FaTrash, FaPlus, FaSearch, FaDownload } from "react-icons/fa"
+import PageHeader from "@/components/ui/PageHeader"
+import StatsCard from "@/components/ui/StatsCard"
 import AdminModal from "../components/modals/AdminModal"
+import DeleteModal from "../components/DeleteModal"
+import BulkActionModal from "../components/BulkActionModal"
+import { toast } from "sonner"
 
-const AdminPage = () => {
-  const [users, setUsers] = useState<User[]>([])
-  const [searchQuery, setSearchQuery] = useState("")
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+interface AdminData {
+  id: string
+  name: string
+  email: string
+  phone: string
+  address: string
+  role: string
+  permissions: string
+  department: string
+  accessLevel: string
+  lastLogin: string
+  twoFactorEnabled: boolean
+  status: "active" | "inactive"
+  avatar: string
+}
+
+export default function AdminPage() {
+  const [admins, setAdmins] = useState<AdminData[]>([
+    {
+      id: "1",
+      name: "Super Admin",
+      email: "superadmin@kejadiluar.com",
+      phone: "+62 812-3456-7890",
+      address: "Jakarta, Indonesia",
+      role: "Super Admin",
+      permissions: "Full Access",
+      department: "Management",
+      accessLevel: "Level 1",
+      lastLogin: "2024-01-15 09:30",
+      twoFactorEnabled: true,
+      status: "active",
+      avatar: "SA",
+    },
+    {
+      id: "2",
+      name: "Admin Verifikasi",
+      email: "verifikasi@kejadiluar.com",
+      phone: "+62 813-4567-8901",
+      address: "Bandung, Indonesia",
+      role: "Verification Admin",
+      permissions: "Verification Only",
+      department: "Operations",
+      accessLevel: "Level 2",
+      lastLogin: "2024-01-15 08:45",
+      twoFactorEnabled: false,
+      status: "active",
+      avatar: "AV",
+    },
+    {
+      id: "3",
+      name: "Admin User",
+      email: "useradmin@kejadiluar.com",
+      phone: "+62 814-5678-9012",
+      address: "Surabaya, Indonesia",
+      role: "User Admin",
+      permissions: "User Management",
+      department: "HR",
+      accessLevel: "Level 2",
+      lastLogin: "2024-01-14 16:20",
+      twoFactorEnabled: true,
+      status: "inactive",
+      avatar: "AU",
+    },
+  ])
+
+  const [filteredAdmins, setFilteredAdmins] = useState(admins)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [statusFilter, setStatusFilter] = useState("")
+  const [roleFilter, setRoleFilter] = useState("")
+  const [selectedAdmins, setSelectedAdmins] = useState<string[]>([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage] = useState(10)
+  const [loading, setLoading] = useState(false)
+
+  // Modal states
+  const [showUserModal, setShowUserModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showBulkModal, setShowBulkModal] = useState(false)
+  const [selectedAdmin, setSelectedAdmin] = useState<AdminData | null>(null)
   const [modalMode, setModalMode] = useState<"create" | "edit">("create")
 
+  // Filter and search
   useEffect(() => {
-    // Fetch users from API (replace with your actual API endpoint)
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch("/api/users")
-        if (!response.ok) {
-          throw new Error("Failed to fetch users")
-        }
-        const data = await response.json()
-        setUsers(data)
-      } catch (error: any) {
-        console.error("Error fetching users:", error.message)
-      }
-    }
+    const filtered = admins.filter((admin) => {
+      const matchesSearch =
+        admin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        admin.email.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesStatus = statusFilter === "" || admin.status === statusFilter
+      const matchesRole = roleFilter === "" || admin.role === roleFilter
 
-    fetchUsers()
-  }, [])
+      return matchesSearch && matchesStatus && matchesRole
+    })
 
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value)
-  }
+    setFilteredAdmins(filtered)
+    setCurrentPage(1)
+  }, [searchTerm, statusFilter, roleFilter, admins])
 
-  const filteredUsers = users.filter((user) => user.name.toLowerCase().includes(searchQuery.toLowerCase()))
+  // Pagination
+  const indexOfLastItem = currentPage * itemsPerPage
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage
+  const currentAdmins = filteredAdmins.slice(indexOfFirstItem, indexOfLastItem)
+  const totalPages = Math.ceil(filteredAdmins.length / itemsPerPage)
 
-  const handleEdit = (user: User) => {
-    setSelectedUser(user)
-    setModalMode("edit")
-    setIsModalOpen(true)
-  }
-
-  const handleCreate = () => {
-    setSelectedUser(null)
+  // CRUD Operations
+  const handleCreateAdmin = () => {
+    setSelectedAdmin(null)
     setModalMode("create")
-    setIsModalOpen(true)
+    setShowUserModal(true)
   }
 
-  const handleDelete = async (id: string) => {
+  const handleEditAdmin = (admin: AdminData) => {
+    setSelectedAdmin(admin)
+    setModalMode("edit")
+    setShowUserModal(true)
+  }
+
+  const handleDeleteAdmin = (admin: AdminData) => {
+    setSelectedAdmin(admin)
+    setShowDeleteModal(true)
+  }
+
+  const handleSaveAdmin = async (adminData: any) => {
+    setLoading(true)
     try {
-      const response = await fetch(`/api/users/${id}`, {
-        method: "DELETE",
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to delete user")
+      if (modalMode === "create") {
+        const newAdmin: AdminData = {
+          ...adminData,
+          id: Date.now().toString(),
+          avatar: adminData.name
+            .split(" ")
+            .map((n: string) => n[0])
+            .join("")
+            .substring(0, 2),
+          lastLogin: "Never",
+        }
+        setAdmins([...admins, newAdmin])
+        toast.success("Admin berhasil ditambahkan!")
+      } else {
+        setAdmins(admins.map((admin) => (admin.id === selectedAdmin?.id ? { ...admin, ...adminData } : admin)))
+        toast.success("Admin berhasil diperbarui!")
       }
-
-      // Update the users state after successful deletion
-      setUsers(users.filter((user) => user.id !== id))
-    } catch (error: any) {
-      console.error("Error deleting user:", error.message)
+      setShowUserModal(false)
+    } catch (error) {
+      toast.error("Terjadi kesalahan!")
+    } finally {
+      setLoading(false)
     }
   }
 
-  const handleSave = async (userData: User) => {
+  const handleConfirmDelete = async () => {
+    setLoading(true)
     try {
-      let response
-      if (modalMode === "create") {
-        response = await fetch("/api/users", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(userData),
-        })
-      } else {
-        response = await fetch(`/api/users/${selectedUser?.id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(userData),
-        })
+      setAdmins(admins.filter((admin) => admin.id !== selectedAdmin?.id))
+      setShowDeleteModal(false)
+      toast.success("Admin berhasil dihapus!")
+    } catch (error) {
+      toast.error("Terjadi kesalahan!")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Bulk operations
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedAdmins(currentAdmins.map((admin) => admin.id))
+    } else {
+      setSelectedAdmins([])
+    }
+  }
+
+  const handleSelectAdmin = (adminId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedAdmins([...selectedAdmins, adminId])
+    } else {
+      setSelectedAdmins(selectedAdmins.filter((id) => id !== adminId))
+    }
+  }
+
+  const handleBulkAction = async (action: string) => {
+    setLoading(true)
+    try {
+      const selectedAdminData = admins.filter((admin) => selectedAdmins.includes(admin.id))
+
+      switch (action) {
+        case "activate":
+          setAdmins(
+            admins.map((admin) =>
+              selectedAdmins.includes(admin.id) ? { ...admin, status: "active" as const } : admin,
+            ),
+          )
+          toast.success(`${selectedAdmins.length} admin berhasil diaktifkan!`)
+          break
+        case "deactivate":
+          setAdmins(
+            admins.map((admin) =>
+              selectedAdmins.includes(admin.id) ? { ...admin, status: "inactive" as const } : admin,
+            ),
+          )
+          toast.success(`${selectedAdmins.length} admin berhasil dinonaktifkan!`)
+          break
+        case "delete":
+          setAdmins(admins.filter((admin) => !selectedAdmins.includes(admin.id)))
+          toast.success(`${selectedAdmins.length} admin berhasil dihapus!`)
+          break
+        case "export":
+          // Export functionality
+          const csvContent =
+            "data:text/csv;charset=utf-8," +
+            "Name,Email,Role,Status\n" +
+            selectedAdminData.map((admin) => `${admin.name},${admin.email},${admin.role},${admin.status}`).join("\n")
+
+          const encodedUri = encodeURI(csvContent)
+          const link = document.createElement("a")
+          link.setAttribute("href", encodedUri)
+          link.setAttribute("download", "admin_data.csv")
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+          toast.success("Data berhasil diekspor!")
+          break
       }
 
-      if (!response.ok) {
-        throw new Error("Failed to save user")
-      }
-
-      const updatedUser = await response.json()
-
-      if (modalMode === "create") {
-        setUsers([...users, updatedUser])
-      } else {
-        setUsers(users.map((user) => (user.id === updatedUser.id ? updatedUser : user)))
-      }
-
-      setIsModalOpen(false)
-    } catch (error: any) {
-      console.error("Error saving user:", error.message)
+      setSelectedAdmins([])
+      setShowBulkModal(false)
+    } catch (error) {
+      toast.error("Terjadi kesalahan!")
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
-    <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-semibold mb-5">Admin Dashboard</h1>
+    <>
+      <PageHeader title="Manajemen Admin" description="Kelola akun administrator dan hak akses sistem">
+        <div className="flex space-x-2">
+          {selectedAdmins.length > 0 && (
+            <button
+              onClick={() => setShowBulkModal(true)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+            >
+              <FaUsers className="mr-2" />
+              Aksi Massal ({selectedAdmins.length})
+            </button>
+          )}
+          <button
+            onClick={handleCreateAdmin}
+            className="bg-red-900 text-white px-4 py-2 rounded-lg hover:bg-red-800 transition-colors flex items-center"
+          >
+            <FaPlus className="mr-2" />
+            Tambah Admin
+          </button>
+        </div>
+      </PageHeader>
 
-      <div className="flex justify-between items-center mb-5">
-        <Input type="text" placeholder="Search users..." value={searchQuery} onChange={handleSearch} />
-        <Button onClick={handleCreate}>Create User</Button>
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
+        <StatsCard
+          title="Total Admin"
+          value={admins.length.toString()}
+          change="+2"
+          changeType="positive"
+          icon={<FaUserShield className="text-blue-600" />}
+          iconBg="bg-blue-100"
+        />
+
+        <StatsCard
+          title="Admin Aktif"
+          value={admins.filter((a) => a.status === "active").length.toString()}
+          change="0"
+          changeType="neutral"
+          icon={<FaUsers className="text-green-600" />}
+          iconBg="bg-green-100"
+        />
+
+        <StatsCard
+          title="Super Admin"
+          value={admins.filter((a) => a.role === "Super Admin").length.toString()}
+          change="0"
+          changeType="neutral"
+          icon={<FaCrown className="text-yellow-600" />}
+          iconBg="bg-yellow-100"
+        />
+
+        <StatsCard
+          title="Role Tersedia"
+          value="5"
+          change="+1"
+          changeType="positive"
+          icon={<FaKey className="text-purple-600" />}
+          iconBg="bg-purple-100"
+        />
       </div>
 
-      <Table>
-        <TableCaption>A list of your users.</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">ID</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredUsers.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell className="font-medium">{user.id}</TableCell>
-              <TableCell>{user.name}</TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>{user.role}</TableCell>
-              <TableCell className="text-right">
-                <Button variant="secondary" size="sm" onClick={() => handleEdit(user)}>
-                  Edit
-                </Button>{" "}
-                <Button variant="destructive" size="sm" onClick={() => handleDelete(user.id)}>
-                  Delete
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      {/* Filters and Search */}
+      {/* <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 mb-6">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 flex-1">
+            <div className="relative flex-1 max-w-md">
+              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Cari admin..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              />
+            </div>
 
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+            >
+              <option value="">Semua Status</option>
+              <option value="active">Aktif</option>
+              <option value="inactive">Tidak Aktif</option>
+            </select>
+
+            <select
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+            >
+              <option value="">Semua Role</option>
+              <option value="Super Admin">Super Admin</option>
+              <option value="Verification Admin">Verification Admin</option>
+              <option value="User Admin">User Admin</option>
+            </select>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => handleBulkAction("export")}
+              className="px-3 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors flex items-center"
+            >
+              <FaDownload className="mr-2" />
+              Export
+            </button>
+          </div>
+        </div>
+      </div> */}
+
+      {/* Admin Table */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="p-4 md:p-6 border-b border-gray-100">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-bold text-gray-900">Daftar Administrator</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Menampilkan {currentAdmins.length} dari {filteredAdmins.length} admin
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 md:px-6 py-3 text-left">
+                  <input
+                    type="checkbox"
+                    checked={selectedAdmins.length === currentAdmins.length && currentAdmins.length > 0}
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+                  />
+                </th>
+                <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Admin
+                </th>
+                <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Email
+                </th>
+                <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Role
+                </th>
+                <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Permissions
+                </th>
+                <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Last Login
+                </th>
+                <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Aksi
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {currentAdmins.map((admin) => (
+                <tr key={admin.id} className="hover:bg-gray-50">
+                  <td className="px-4 md:px-6 py-4 whitespace-nowrap">
+                    <input
+                      type="checkbox"
+                      checked={selectedAdmins.includes(admin.id)}
+                      onChange={(e) => handleSelectAdmin(admin.id, e.target.checked)}
+                      className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+                    />
+                  </td>
+                  <td className="px-4 md:px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 bg-red-900 rounded-full flex items-center justify-center mr-3">
+                        <span className="text-white text-xs font-semibold">{admin.avatar}</span>
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">{admin.name}</div>
+                        <div className="text-xs text-gray-500">{admin.phone}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 md:px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{admin.email}</div>
+                  </td>
+                  <td className="px-4 md:px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{admin.role}</div>
+                  </td>
+                  <td className="px-4 md:px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{admin.permissions}</div>
+                  </td>
+                  <td className="px-4 md:px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">{admin.lastLogin}</div>
+                  </td>
+                  <td className="px-4 md:px-6 py-4 whitespace-nowrap">
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        admin.status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {admin.status === "active" ? "Aktif" : "Tidak Aktif"}
+                    </span>
+                  </td>
+                  <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleEditAdmin(admin)}
+                        className="text-blue-600 hover:text-blue-900 p-1"
+                        title="Edit"
+                      >
+                        <FaEdit />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteAdmin(admin)}
+                        className="text-red-600 hover:text-red-900 p-1"
+                        title="Hapus"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="px-4 md:px-6 py-3 border-t border-gray-200 flex items-center justify-between">
+            <div className="text-sm text-gray-700">
+              Menampilkan {indexOfFirstItem + 1} - {Math.min(indexOfLastItem, filteredAdmins.length)} dari{" "}
+              {filteredAdmins.length} data
+            </div>
+            <div className="flex space-x-1">
+              <button
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Sebelumnya
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`px-3 py-1 text-sm border rounded ${
+                    currentPage === page ? "bg-red-900 text-white border-red-900" : "border-gray-300 hover:bg-gray-50"
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+              <button
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Selanjutnya
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Modals */}
       <AdminModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleSave}
-        userData={selectedUser}
+        isOpen={showUserModal}
+        onClose={() => setShowUserModal(false)}
+        onSave={handleSaveAdmin}
+        userData={selectedAdmin}
         mode={modalMode}
       />
-    </div>
+
+      <DeleteModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleConfirmDelete}
+        userName={selectedAdmin?.name || ""}
+        userType="Admin"
+      />
+
+      <BulkActionModal
+        isOpen={showBulkModal}
+        onClose={() => setShowBulkModal(false)}
+        selectedUsers={admins.filter((admin) => selectedAdmins.includes(admin.id))}
+        onBulkAction={handleBulkAction}
+        userType="admin"
+      />
+    </>
   )
 }
-
-export default AdminPage

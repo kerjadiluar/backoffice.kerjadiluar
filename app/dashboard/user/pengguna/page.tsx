@@ -154,7 +154,7 @@ export default function PenggunaPage() {
       </div>
 
       {/* Search */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 mb-6">
+      {/* <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 mb-6">
         <div className="relative max-w-md">
           <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <Input
@@ -165,7 +165,7 @@ export default function PenggunaPage() {
             className="pl-10"
           />
         </div>
-      </div>
+      </div> */}
 
       {/* Users Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">

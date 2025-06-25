@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import { FaTimes, FaSave, FaSpinner } from "react-icons/fa"
 
@@ -17,13 +16,9 @@ export default function AdminModal({ isOpen, onClose, onSave, userData, mode }: 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    phone: "",
+    password: "",
+    confirmPassword: "",
     address: "",
-    role: "Admin",
-    permissions: "Full Access",
-    department: "",
-    accessLevel: "Level 1",
-    lastLogin: "",
     twoFactorEnabled: false,
     status: "active",
   })
@@ -33,18 +28,14 @@ export default function AdminModal({ isOpen, onClose, onSave, userData, mode }: 
 
   useEffect(() => {
     if (userData && mode === "edit") {
-      setFormData({ ...formData, ...userData })
+      setFormData({ ...formData, ...userData, password: "", confirmPassword: "" }) // Reset password fields
     } else if (mode === "create") {
       setFormData({
         name: "",
         email: "",
-        phone: "",
+        password: "",
+        confirmPassword: "",
         address: "",
-        role: "Admin",
-        permissions: "Full Access",
-        department: "",
-        accessLevel: "Level 1",
-        lastLogin: "",
         twoFactorEnabled: false,
         status: "active",
       })
@@ -56,8 +47,8 @@ export default function AdminModal({ isOpen, onClose, onSave, userData, mode }: 
     if (!formData.name.trim()) newErrors.name = "Nama wajib diisi"
     if (!formData.email.trim()) newErrors.email = "Email wajib diisi"
     if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Format email tidak valid"
-    if (!formData.phone.trim()) newErrors.phone = "Nomor telepon wajib diisi"
-    if (!formData.department.trim()) newErrors.department = "Departemen wajib diisi"
+    if (!formData.password.trim()) newErrors.password = "Password wajib diisi"
+    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Password tidak cocok"
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -78,7 +69,7 @@ export default function AdminModal({ isOpen, onClose, onSave, userData, mode }: 
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target
     const checked = (e.target as HTMLInputElement).checked
 
@@ -106,7 +97,7 @@ export default function AdminModal({ isOpen, onClose, onSave, userData, mode }: 
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Basic Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap *</label>
               <input
@@ -138,107 +129,39 @@ export default function AdminModal({ isOpen, onClose, onSave, userData, mode }: 
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Password *</label>
               <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
+                type="password"
+                name="password"
+                value={formData.password}
                 onChange={handleChange}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 ${
-                  errors.phone ? "border-red-500" : "border-gray-300"
+                  errors.password ? "border-red-500" : "border-gray-300"
                 }`}
-                placeholder="+62 812-3456-7890"
+                placeholder="Masukkan password"
               />
-              {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Departemen *</label>
-              <select
-                name="department"
-                value={formData.department}
+              <label className="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password *</label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={formData.confirmPassword}
                 onChange={handleChange}
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 ${
-                  errors.department ? "border-red-500" : "border-gray-300"
+                  errors.confirmPassword ? "border-red-500" : "border-gray-300"
                 }`}
-              >
-                <option value="">Pilih Departemen</option>
-                <option value="IT">Information Technology</option>
-                <option value="HR">Human Resources</option>
-                <option value="Finance">Finance</option>
-                <option value="Operations">Operations</option>
-                <option value="Management">Management</option>
-              </select>
-              {errors.department && <p className="text-red-500 text-xs mt-1">{errors.department}</p>}
-            </div>
-          </div>
-
-          {/* Admin Specific Fields */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Role Admin</label>
-              <select
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              >
-                <option value="Super Admin">Super Admin</option>
-                <option value="Admin">Admin</option>
-                <option value="Verification Admin">Verification Admin</option>
-                <option value="User Admin">User Admin</option>
-                <option value="Finance Admin">Finance Admin</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Level Akses</label>
-              <select
-                name="accessLevel"
-                value={formData.accessLevel}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              >
-                <option value="Level 1">Level 1 - Full Access</option>
-                <option value="Level 2">Level 2 - Limited Access</option>
-                <option value="Level 3">Level 3 - Read Only</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Permissions</label>
-              <select
-                name="permissions"
-                value={formData.permissions}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              >
-                <option value="Full Access">Full Access</option>
-                <option value="User Management">User Management</option>
-                <option value="Verification Only">Verification Only</option>
-                <option value="Finance Only">Finance Only</option>
-                <option value="Read Only">Read Only</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-              <select
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              >
-                <option value="active">Aktif</option>
-                <option value="inactive">Tidak Aktif</option>
-                <option value="suspended">Suspended</option>
-              </select>
+                placeholder="Konfirmasi password"
+              />
+              {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
             </div>
           </div>
 
           {/* Security Settings */}
           <div className="border-t pt-4">
-            <h3 className="text-lg font-medium text-gray-900 mb-3">Pengaturan Keamanan</h3>
+            {/* <h3 className="text-lg font-medium text-gray-900 mb-3">Pengaturan Keamanan</h3> */}
             <div className="flex items-center">
               <input
                 type="checkbox"
@@ -247,21 +170,8 @@ export default function AdminModal({ isOpen, onClose, onSave, userData, mode }: 
                 onChange={handleChange}
                 className="rounded border-gray-300 text-red-600 focus:ring-red-500"
               />
-              <label className="ml-2 text-sm text-gray-700">Aktifkan Two-Factor Authentication</label>
+              <label className="ml-2 text-sm text-gray-700">Saya menyatakan bahwa data yang ditambah sudah benar.</label>
             </div>
-          </div>
-
-          {/* Address */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Alamat</label>
-            <textarea
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-              placeholder="Masukkan alamat lengkap"
-            />
           </div>
 
           {/* Action Buttons */}

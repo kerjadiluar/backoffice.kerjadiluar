@@ -219,18 +219,21 @@ export default function MentorPage() {
     <>
       <PageHeader title="Manajemen Mentor" description="Kelola mentor dan pembimbing untuk pekerja di lapangan">
         <div className="flex space-x-2">
-          <Button variant="outline" size="sm">
-            <FaUpload className="mr-2 h-4 w-4" />
+          <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center">
+            <FaUpload className="mr-2" />
             Import
-          </Button>
-          <Button variant="outline" size="sm">
-            <FaDownload className="mr-2 h-4 w-4" />
+          </button>
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
+            <FaDownload className="mr-2" />
             Export
-          </Button>
-          <Button onClick={handleCreate} size="sm">
-            <FaPlus className="mr-2 h-4 w-4" />
+          </button>
+          <button
+            onClick={handleCreate}
+            className="bg-red-900 text-white px-4 py-2 rounded-lg hover:bg-red-800 transition-colors flex items-center"
+          >
+            <FaPlus className="mr-2" />
             Tambah Mentor
-          </Button>
+          </button>
         </div>
       </PageHeader>
 
@@ -274,7 +277,7 @@ export default function MentorPage() {
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 mb-6">
+      {/* <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 mb-6">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex flex-col sm:flex-row gap-4 flex-1">
             <div className="relative flex-1 max-w-md">
@@ -310,7 +313,7 @@ export default function MentorPage() {
             </select>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Mentors Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">

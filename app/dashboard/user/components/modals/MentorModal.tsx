@@ -1,15 +1,8 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { FaSave, FaSpinner } from "react-icons/fa"
+import { FaTimes, FaSave, FaSpinner } from "react-icons/fa"
 import type { MentorData } from "@/lib/types"
 
 interface MentorModalProps {
@@ -108,61 +101,66 @@ export default function MentorModal({ isOpen, onClose, onSave, userData, mode }:
     }
   }
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{mode === "create" ? "Tambah" : "Edit"} Mentor</DialogTitle>
-        </DialogHeader>
+  if (!isOpen) return null
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <h2 className="text-xl font-bold text-gray-900">{mode === "create" ? "Tambah" : "Edit"} Mentor</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+            <FaTimes size={20} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Personal Information */}
           <div>
             <h3 className="text-lg font-medium text-gray-900 mb-3">Informasi Pribadi</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="name">Nama Lengkap *</Label>
-                <Input
-                  id="name"
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap *</label>
+                <input
+                  type="text"
                   value={formData.name || ""}
                   onChange={(e) => handleChange("name", e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 ${errors.name ? "border-red-500" : "border-gray-300"}`}
                   placeholder="Suzuki Takeshi"
-                  className={errors.name ? "border-red-500" : ""}
                 />
                 {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
               </div>
 
               <div>
-                <Label htmlFor="email">Email *</Label>
-                <Input
-                  id="email"
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                <input
                   type="email"
                   value={formData.email || ""}
                   onChange={(e) => handleChange("email", e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 ${errors.email ? "border-red-500" : "border-gray-300"}`}
                   placeholder="suzuki@company.co.jp"
-                  className={errors.email ? "border-red-500" : ""}
                 />
                 {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
               </div>
 
               <div>
-                <Label htmlFor="phone">Nomor Telepon *</Label>
-                <Input
-                  id="phone"
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon *</label>
+                <input
+                  type="tel"
                   value={formData.phone || ""}
                   onChange={(e) => handleChange("phone", e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 ${errors.phone ? "border-red-500" : "border-gray-300"}`}
                   placeholder="+81-90-1234-5678"
-                  className={errors.phone ? "border-red-500" : ""}
                 />
                 {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
               </div>
 
               <div>
-                <Label htmlFor="address">Alamat</Label>
-                <Input
-                  id="address"
+                <label className="block text-sm font-medium text-gray-700 mb-1">Alamat</label>
+                <input
+                  type="text"
                   value={formData.address || ""}
                   onChange={(e) => handleChange("address", e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                   placeholder="Tokyo, Japan"
                 />
               </div>
@@ -174,33 +172,34 @@ export default function MentorModal({ isOpen, onClose, onSave, userData, mode }:
             <h3 className="text-lg font-medium text-gray-900 mb-3">Informasi Perusahaan</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="companyName">Nama Perusahaan *</Label>
-                <Input
-                  id="companyName"
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nama Perusahaan *</label>
+                <input
+                  type="text"
                   value={formData.companyName || ""}
                   onChange={(e) => handleChange("companyName", e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 ${errors.companyName ? "border-red-500" : "border-gray-300"}`}
                   placeholder="Toyota Manufacturing"
-                  className={errors.companyName ? "border-red-500" : ""}
                 />
                 {errors.companyName && <p className="text-red-500 text-xs mt-1">{errors.companyName}</p>}
               </div>
 
               <div>
-                <Label htmlFor="position">Posisi</Label>
-                <Input
-                  id="position"
+                <label className="block text-sm font-medium text-gray-700 mb-1">Posisi</label>
+                <input
+                  type="text"
                   value={formData.position || ""}
                   onChange={(e) => handleChange("position", e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                   placeholder="Senior Manager"
                 />
               </div>
 
               <div className="md:col-span-2">
-                <Label htmlFor="companyAddress">Alamat Perusahaan</Label>
-                <Textarea
-                  id="companyAddress"
+                <label className="block text-sm font-medium text-gray-700 mb-1">Alamat Perusahaan</label>
+                <textarea
                   value={formData.companyAddress || ""}
                   onChange={(e) => handleChange("companyAddress", e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                   placeholder="Alamat lengkap perusahaan"
                   rows={2}
                 />
@@ -213,54 +212,51 @@ export default function MentorModal({ isOpen, onClose, onSave, userData, mode }:
             <h3 className="text-lg font-medium text-gray-900 mb-3">Informasi Profesional</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="specialization">Spesialisasi *</Label>
-                <Select
+                <label className="block text-sm font-medium text-gray-700 mb-1">Spesialisasi *</label>
+                <select
                   value={formData.specialization || ""}
-                  onValueChange={(value) => handleChange("specialization", value)}
+                  onChange={(e) => handleChange("specialization", e.target.value)}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 ${errors.specialization ? "border-red-500" : "border-gray-300"}`}
                 >
-                  <SelectTrigger className={errors.specialization ? "border-red-500" : ""}>
-                    <SelectValue placeholder="Pilih Spesialisasi" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Manufacturing">Manufacturing</SelectItem>
-                    <SelectItem value="Automotive">Automotive</SelectItem>
-                    <SelectItem value="Electronics">Electronics</SelectItem>
-                    <SelectItem value="Construction">Construction</SelectItem>
-                    <SelectItem value="Agriculture">Agriculture</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <option value="">Pilih Spesialisasi</option>
+                  <option value="Manufacturing">Manufacturing</option>
+                  <option value="Automotive">Automotive</option>
+                  <option value="Electronics">Electronics</option>
+                  <option value="Construction">Construction</option>
+                  <option value="Agriculture">Agriculture</option>
+                </select>
                 {errors.specialization && <p className="text-red-500 text-xs mt-1">{errors.specialization}</p>}
               </div>
 
               <div>
-                <Label htmlFor="experience">Pengalaman (tahun)</Label>
-                <Input
-                  id="experience"
+                <label className="block text-sm font-medium text-gray-700 mb-1">Pengalaman (tahun)</label>
+                <input
                   type="number"
                   value={formData.experience || 0}
                   onChange={(e) => handleChange("experience", Number(e.target.value))}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                   min="0"
                 />
               </div>
 
               <div>
-                <Label htmlFor="mentees">Jumlah Mentee</Label>
-                <Input
-                  id="mentees"
+                <label className="block text-sm font-medium text-gray-700 mb-1">Jumlah Mentee</label>
+                <input
                   type="number"
                   value={formData.mentees || 0}
                   onChange={(e) => handleChange("mentees", Number(e.target.value))}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                   min="0"
                 />
               </div>
 
               <div>
-                <Label htmlFor="rating">Rating</Label>
-                <Input
-                  id="rating"
+                <label className="block text-sm font-medium text-gray-700 mb-1">Rating</label>
+                <input
                   type="number"
                   value={formData.rating || 0}
                   onChange={(e) => handleChange("rating", Number(e.target.value))}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                   min="0"
                   max="5"
                   step="0.1"
@@ -268,40 +264,37 @@ export default function MentorModal({ isOpen, onClose, onSave, userData, mode }:
               </div>
 
               <div>
-                <Label htmlFor="availability">Ketersediaan</Label>
-                <Select
+                <label className="block text-sm font-medium text-gray-700 mb-1">Ketersediaan</label>
+                <select
                   value={formData.availability || "available"}
-                  onValueChange={(value) => handleChange("availability", value)}
+                  onChange={(e) => handleChange("availability", e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                 >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="available">Available</SelectItem>
-                    <SelectItem value="busy">Busy</SelectItem>
-                    <SelectItem value="full">Full Capacity</SelectItem>
-                    <SelectItem value="on-leave">On Leave</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <option value="available">Available</option>
+                  <option value="busy">Busy</option>
+                  <option value="full">Full Capacity</option>
+                  <option value="on-leave">On Leave</option>
+                </select>
               </div>
 
               <div>
-                <Label htmlFor="workingHours">Jam Kerja</Label>
-                <Input
-                  id="workingHours"
+                <label className="block text-sm font-medium text-gray-700 mb-1">Jam Kerja</label>
+                <input
+                  type="text"
                   value={formData.workingHours || ""}
                   onChange={(e) => handleChange("workingHours", e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                   placeholder="Monday-Friday 9AM-6PM JST"
                 />
               </div>
             </div>
 
             <div className="mt-4">
-              <Label htmlFor="bio">Bio/Deskripsi</Label>
-              <Textarea
-                id="bio"
+              <label className="block text-sm font-medium text-gray-700 mb-1">Bio/Deskripsi</label>
+              <textarea
                 value={formData.bio || ""}
                 onChange={(e) => handleChange("bio", e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                 placeholder="Ceritakan tentang pengalaman dan keahlian sebagai mentor"
                 rows={3}
               />
@@ -310,40 +303,39 @@ export default function MentorModal({ isOpen, onClose, onSave, userData, mode }:
 
           {/* Status */}
           <div>
-            <Label htmlFor="status">Status</Label>
-            <Select value={formData.status || "active"} onValueChange={(value) => handleChange("status", value)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="active">Aktif</SelectItem>
-                <SelectItem value="inactive">Tidak Aktif</SelectItem>
-                <SelectItem value="suspended">Suspended</SelectItem>
-              </SelectContent>
-            </Select>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <select
+              value={formData.status || "active"}
+              onChange={(e) => handleChange("status", e.target.value)}
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+            >
+              <option value="active">Aktif</option>
+              <option value="inactive">Tidak Aktif</option>
+              <option value="suspended">Suspended</option>
+            </select>
           </div>
 
           {/* Action Buttons */}
           <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <button type="button" onClick={onClose} className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
               Batal
-            </Button>
-            <Button type="submit" disabled={isLoading}>
+            </button>
+            <button type="submit" disabled={isLoading} className="px-4 py-2 bg-red-900 text-white rounded-lg hover:bg-red-800 transition-colors flex items-center disabled:opacity-50">
               {isLoading ? (
                 <>
-                  <FaSpinner className="animate-spin mr-2 h-4 w-4" />
+                  <FaSpinner className="animate-spin mr-2" />
                   Menyimpan...
                 </>
               ) : (
                 <>
-                  <FaSave className="mr-2 h-4 w-4" />
+                  <FaSave className="mr-2" />
                   Simpan
                 </>
               )}
-            </Button>
+            </button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   )
 }

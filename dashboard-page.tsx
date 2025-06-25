@@ -52,12 +52,12 @@ const utamaMenu = [
     name: "User Management",
     icon: <FaUsers />,
     children: [
-      { name: "Pengguna", href: "/dashboard/user/pengguna", icon: <FaUserFriends /> },
       { name: "Admin", href: "/dashboard/user/admin", icon: <FaUserShield /> },
       { name: "Pengajar", href: "/dashboard/user/pengajar", icon: <FaChalkboardTeacher /> },
       { name: "Mentor", href: "/dashboard/user/mentor", icon: <FaUserTie /> },
       { name: "Karyawan", href: "/dashboard/user/karyawan", icon: <FaUserTie /> },
       { name: "Mitra", href: "/dashboard/user/mitra", icon: <FaHandshake /> },
+      { name: "Pengguna", href: "/dashboard/user/pengguna", icon: <FaUserFriends /> },
     ],
   },
 ]

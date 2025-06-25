@@ -17,7 +17,7 @@ import {
 } from "react-icons/fa"
 import PageHeader from "@/components/ui/PageHeader"
 import StatsCard from "@/components/ui/StatsCard"
-import UserModal from "../components/UserModal"
+import UserModal from "../components/modals/PengajarModal"
 import DeleteModal from "../components/DeleteModal"
 import BulkActionModal from "../components/BulkActionModal"
 
@@ -214,7 +214,7 @@ export default function PengajarPage() {
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 mb-6">
+      {/* <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 mb-6">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex flex-col sm:flex-row gap-4 flex-1">
             <div className="relative flex-1 max-w-md">
@@ -260,7 +260,7 @@ export default function PengajarPage() {
             </button>
           )}
         </div>
-      </div>
+      </div> */}
 
       {/* Teachers Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">

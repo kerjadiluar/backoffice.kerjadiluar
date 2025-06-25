@@ -52,12 +52,12 @@ const utamaMenu = [
     name: "User Management",
     icon: <FaUsers />,
     children: [
-      { name: "Pengguna", href: "/dashboard/user/pengguna", icon: <FaUserFriends /> },
       { name: "Admin", href: "/dashboard/user/admin", icon: <FaUserShield /> },
       { name: "Pengajar", href: "/dashboard/user/pengajar", icon: <FaChalkboardTeacher /> },
       { name: "Mentor", href: "/dashboard/user/mentor", icon: <FaUserTie /> },
       { name: "Karyawan", href: "/dashboard/user/karyawan", icon: <FaUserTie /> },
       { name: "Mitra", href: "/dashboard/user/mitra", icon: <FaHandshake /> },
+      { name: "Pengguna", href: "/dashboard/user/pengguna", icon: <FaUserFriends /> },
     ],
   },
 ]
@@ -197,7 +197,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </div>
 
         {/* Navigation - Updated with thinner scrollbar class */}
-        <nav className="flex-1 overflow-y-auto py-4 px-3 sidebar-scroll">
+        <nav className="flex-1 overflow-y-auto py-4 px-3 sidebar-scroll slim-scroll">
           {/* Main Section */}
           <div className="mb-8">
             {(!sidebarCollapsed || isMobile) && (
