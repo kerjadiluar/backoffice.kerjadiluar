@@ -384,16 +384,15 @@ export default function KaryawanPage() {
 
       {/* Modals */}
       <UserModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        mode={modalMode}
-        title={modalMode === "create" ? "Tambah Karyawan" : "Edit Karyawan"}
-        userData={selectedEmployee}
-        onSave={(data) => {
-          console.log("Submit:", data)
-          setShowModal(false)
-        }}
-      />
+  isOpen={showModal}
+  onClose={() => setShowModal(false)}
+  mode={modalMode}
+  userData={selectedEmployee}
+  onSave={(data) => {
+    console.log("Submit:", data)
+    setShowModal(false)
+  }}
+/>
 
       <DeleteModal
         isOpen={showDeleteModal}
