@@ -1,6 +1,7 @@
 import { FaEye, FaMousePointer, FaUsers, FaChartLine } from "react-icons/fa"
 import PageHeader from "@/components/ui/PageHeader"
 import StatsCard from "@/components/ui/StatsCard"
+import Tooltip from "@/components/ui/Tooltip"
 
 export default function PemasaranPage() {
   const campaigns = [
@@ -50,42 +51,50 @@ export default function PemasaranPage() {
       </PageHeader>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
-        <StatsCard
-          title="Total Impressions"
-          value="1.2M"
-          change="+18%"
-          changeType="positive"
-          icon={<FaEye className="text-blue-600" />}
-          iconBg="bg-blue-100"
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
+        <Tooltip content="Jumlah total impresi yang didapat dari seluruh channel pemasaran bulan ini.">
+          <StatsCard
+            title="Total Impressions"
+            value="1.2M"
+            change="+18%"
+            changeType="positive"
+            icon={<FaEye className="text-blue-600" />}
+            iconBg="bg-blue-100"
+          />
+        </Tooltip>
 
-        <StatsCard
-          title="Click Rate"
-          value="3.4%"
-          change="+0.8%"
-          changeType="positive"
-          icon={<FaMousePointer className="text-green-600" />}
-          iconBg="bg-green-100"
-        />
+        <Tooltip content="Persentase klik yang didapat dibandingkan dengan total impresi (Click-Through Rate).">
+          <StatsCard
+            title="Click Rate"
+            value="3.4%"
+            change="+0.8%"
+            changeType="positive"
+            icon={<FaMousePointer className="text-green-600" />}
+            iconBg="bg-green-100"
+          />
+        </Tooltip>
 
-        <StatsCard
-          title="Leads Generated"
-          value="456"
-          change="+25%"
-          changeType="positive"
-          icon={<FaUsers className="text-yellow-600" />}
-          iconBg="bg-yellow-100"
-        />
+        <Tooltip content="Jumlah calon pekerja yang berhasil mengisi form atau menghubungi tim pemasaran (Leads Generated).">
+          <StatsCard
+            title="Leads Generated"
+            value="456"
+            change="+25%"
+            changeType="positive"
+            icon={<FaUsers className="text-yellow-600" />}
+            iconBg="bg-yellow-100"
+          />
+        </Tooltip>
 
-        <StatsCard
-          title="Conversion Rate"
-          value="12.8%"
-          change="+2.1%"
-          changeType="positive"
-          icon={<FaChartLine className="text-purple-600" />}
-          iconBg="bg-purple-100"
-        />
+        <Tooltip content="Persentase leads yang berhasil dikonversi menjadi pendaftar atau peserta (Conversion Rate).">
+          <StatsCard
+            title="Conversion Rate"
+            value="12.8%"
+            change="+2.1%"
+            changeType="positive"
+            icon={<FaChartLine className="text-purple-600" />}
+            iconBg="bg-purple-100"
+          />
+        </Tooltip>
       </div>
 
       {/* Campaign Performance */}

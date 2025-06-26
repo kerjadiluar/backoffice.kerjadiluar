@@ -1,6 +1,7 @@
 import { FaPassport, FaCalendarAlt, FaCheckCircle, FaEdit, FaTrash, FaEye, FaPlus, FaClock } from "react-icons/fa"
 import PageHeader from "@/components/ui/PageHeader"
 import StatsCard from "@/components/ui/StatsCard"
+import Tooltip from "@/components/ui/Tooltip"
 
 export default function VisaPage() {
   const visaApplications = [
@@ -78,41 +79,46 @@ export default function VisaPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
-        <StatsCard
-          title="Total Aplikasi"
-          value="156"
-          change="+12"
-          changeType="positive"
-          icon={<FaPassport className="text-blue-600" />}
-          iconBg="bg-blue-100"
-        />
-
-        <StatsCard
-          title="Visa Disetujui"
-          value="128"
-          change="+8"
-          changeType="positive"
-          icon={<FaCheckCircle className="text-green-600" />}
-          iconBg="bg-green-100"
-        />
-
-        <StatsCard
-          title="Dalam Proses"
-          value="18"
-          change="+3"
-          changeType="positive"
-          icon={<FaClock className="text-yellow-600" />}
-          iconBg="bg-yellow-100"
-        />
-
-        <StatsCard
-          title="Akan Berakhir"
-          value="12"
-          change="+2"
-          changeType="positive"
-          icon={<FaCalendarAlt className="text-red-600" />}
-          iconBg="bg-red-100"
-        />
+        <Tooltip content="Jumlah aplikasi visa yang diajukan.">
+          <StatsCard
+            title="Total Aplikasi"
+            value="156"
+            change="+12"
+            changeType="positive"
+            icon={<FaPassport className="text-blue-600" />}
+            iconBg="bg-blue-100"
+          />
+        </Tooltip>
+        <Tooltip content="Jumlah aplikasi visa yang telah disetujui.">
+          <StatsCard
+            title="Visa Disetujui"
+            value="128"
+            change="+8"
+            changeType="positive"
+            icon={<FaCheckCircle className="text-green-600" />}
+            iconBg="bg-green-100"
+          />
+        </Tooltip>
+        <Tooltip content="Aplikasi visa yang masih dalam proses.">
+          <StatsCard
+            title="Dalam Proses"
+            value="18"
+            change="+3"
+            changeType="positive"
+            icon={<FaClock className="text-yellow-600" />}
+            iconBg="bg-yellow-100"
+          />
+        </Tooltip>
+        <Tooltip content="Jumlah visa yang akan segera berakhir masa berlakunya.">
+          <StatsCard
+            title="Akan Berakhir"
+            value="12"
+            change="+2"
+            changeType="positive"
+            icon={<FaCalendarAlt className="text-red-600" />}
+            iconBg="bg-red-100"
+          />
+        </Tooltip>
       </div>
 
       {/* Visa Types & Upcoming Expirations */}

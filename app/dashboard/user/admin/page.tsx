@@ -7,81 +7,31 @@ import StatsCard from "@/components/ui/StatsCard"
 import AdminModal from "../components/modals/AdminModal"
 import DeleteModal from "../components/DeleteModal"
 import BulkActionModal from "../components/BulkActionModal"
-import { toast } from "sonner"
-
-interface AdminData {
-  id: string
-  name: string
-  email: string
-  phone: string
-  address: string
-  role: string
-  permissions: string
-  department: string
-  accessLevel: string
-  lastLogin: string
-  twoFactorEnabled: boolean
-  status: "active" | "inactive"
-  avatar: string
-}
+import { useAdmins } from "@/lib/hooks/useAdmins"
+import { type AdminData, type CreateAdminRequest } from "@/lib/services/admin-service"
+import { type ApiResponse } from "@/lib/api-clients"
 
 export default function AdminPage() {
-  const [admins, setAdmins] = useState<AdminData[]>([
-    {
-      id: "1",
-      name: "Super Admin",
-      email: "superadmin@kejadiluar.com",
-      phone: "+62 812-3456-7890",
-      address: "Jakarta, Indonesia",
-      role: "Super Admin",
-      permissions: "Full Access",
-      department: "Management",
-      accessLevel: "Level 1",
-      lastLogin: "2024-01-15 09:30",
-      twoFactorEnabled: true,
-      status: "active",
-      avatar: "SA",
-    },
-    {
-      id: "2",
-      name: "Admin Verifikasi",
-      email: "verifikasi@kejadiluar.com",
-      phone: "+62 813-4567-8901",
-      address: "Bandung, Indonesia",
-      role: "Verification Admin",
-      permissions: "Verification Only",
-      department: "Operations",
-      accessLevel: "Level 2",
-      lastLogin: "2024-01-15 08:45",
-      twoFactorEnabled: false,
-      status: "active",
-      avatar: "AV",
-    },
-    {
-      id: "3",
-      name: "Admin User",
-      email: "useradmin@kejadiluar.com",
-      phone: "+62 814-5678-9012",
-      address: "Surabaya, Indonesia",
-      role: "User Admin",
-      permissions: "User Management",
-      department: "HR",
-      accessLevel: "Level 2",
-      lastLogin: "2024-01-14 16:20",
-      twoFactorEnabled: true,
-      status: "inactive",
-      avatar: "AU",
-    },
-  ])
+  const {
+    admins,
+    loading,
+    error,
+    pagination,
+    loadAdmins,
+    createAdmin,
+    updateAdmin,
+    deleteAdmin,
+    bulkUpdateStatus,
+    bulkDelete
+  } = useAdmins({ initialLoad: true })
 
-  const [filteredAdmins, setFilteredAdmins] = useState(admins)
+  const [filteredAdmins, setFilteredAdmins] = useState<AdminData[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("")
   const [roleFilter, setRoleFilter] = useState("")
   const [selectedAdmins, setSelectedAdmins] = useState<string[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(10)
-  const [loading, setLoading] = useState(false)
 
   // Modal states
   const [showUserModal, setShowUserModal] = useState(false)
@@ -94,12 +44,12 @@ export default function AdminPage() {
   useEffect(() => {
     const filtered = admins.filter((admin) => {
       const matchesSearch =
-        admin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        admin.email.toLowerCase().includes(searchTerm.toLowerCase())
-      const matchesStatus = statusFilter === "" || admin.status === statusFilter
-      const matchesRole = roleFilter === "" || admin.role === roleFilter
+        admin.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        admin.email?.toLowerCase().includes(searchTerm.toLowerCase())
+      // const matchesStatus = statusFilter === "" || admin.status === statusFilter
+      // const matchesRole = roleFilter === "" || admin.role === roleFilter
 
-      return matchesSearch && matchesStatus && matchesRole
+      // return matchesSearch && matchesStatus && matchesRole
     })
 
     setFilteredAdmins(filtered)
@@ -130,51 +80,56 @@ export default function AdminPage() {
     setShowDeleteModal(true)
   }
 
-  const handleSaveAdmin = async (adminData: any) => {
-    setLoading(true)
+  // ... inside handleSaveAdmin
+  const handleSaveAdmin = async (adminData: CreateAdminRequest | AdminData): Promise<ApiResponse<AdminData>> => {
     try {
       if (modalMode === "create") {
-        const newAdmin: AdminData = {
-          ...adminData,
-          id: Date.now().toString(),
-          avatar: adminData.name
-            .split(" ")
-            .map((n: string) => n[0])
-            .join("")
-            .substring(0, 2),
-          lastLogin: "Never",
-        }
-        setAdmins([...admins, newAdmin])
-        toast.success("Admin berhasil ditambahkan!")
+        const createData = adminData as CreateAdminRequest;
+        const response = await createAdmin(createData);
+        return {
+          success: response.success,
+          data: response.data,
+          message: response.message,
+          errors: response.errors,
+          meta: response.meta,
+        };
       } else {
-        setAdmins(admins.map((admin) => (admin.id === selectedAdmin?.id ? { ...admin, ...adminData } : admin)))
-        toast.success("Admin berhasil diperbarui!")
+        if (!selectedAdmin?.id) {
+          return { success: false, message: "ID admin tidak ditemukan"};
+        }
+        const response = await updateAdmin(selectedAdmin.id, adminData as AdminData);
+        return {
+          success: response.success,
+          data: response.data,
+          message: response.message,
+          errors: response.errors,
+          meta: response.meta,
+        };
       }
-      setShowUserModal(false)
     } catch (error) {
-      toast.error("Terjadi kesalahan!")
-    } finally {
-      setLoading(false)
+      return { success: false, message: error instanceof Error ? error.message : "Gagal menyimpan admin"};
     }
-  }
+  };
 
-  const handleConfirmDelete = async () => {
-    setLoading(true)
-    try {
-      setAdmins(admins.filter((admin) => admin.id !== selectedAdmin?.id))
-      setShowDeleteModal(false)
-      toast.success("Admin berhasil dihapus!")
-    } catch (error) {
-      toast.error("Terjadi kesalahan!")
-    } finally {
-      setLoading(false)
-    }
+// ... inside handleConfirmDelete
+const handleConfirmDelete = async () => {
+  if (!selectedAdmin?.id) {
+    console.warn("No admin selected for deletion."); // <<< ADD THIS
+    return;
   }
+  console.log("Calling deleteAdmin with ID:", selectedAdmin.id); // <<< ADD THIS
+  try {
+    await deleteAdmin(selectedAdmin.id);
+    setShowDeleteModal(false);
+  } catch (error) {
+    console.error("Error deleting admin:", error);
+  }
+};
 
   // Bulk operations
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedAdmins(currentAdmins.map((admin) => admin.id))
+      setSelectedAdmins(currentAdmins.map((admin) => admin.id!))
     } else {
       setSelectedAdmins([])
     }
@@ -189,55 +144,22 @@ export default function AdminPage() {
   }
 
   const handleBulkAction = async (action: string) => {
-    setLoading(true)
+    if (selectedAdmins.length === 0) {
+      return
+    }
+
     try {
-      const selectedAdminData = admins.filter((admin) => selectedAdmins.includes(admin.id))
-
-      switch (action) {
-        case "activate":
-          setAdmins(
-            admins.map((admin) =>
-              selectedAdmins.includes(admin.id) ? { ...admin, status: "active" as const } : admin,
-            ),
-          )
-          toast.success(`${selectedAdmins.length} admin berhasil diaktifkan!`)
-          break
-        case "deactivate":
-          setAdmins(
-            admins.map((admin) =>
-              selectedAdmins.includes(admin.id) ? { ...admin, status: "inactive" as const } : admin,
-            ),
-          )
-          toast.success(`${selectedAdmins.length} admin berhasil dinonaktifkan!`)
-          break
-        case "delete":
-          setAdmins(admins.filter((admin) => !selectedAdmins.includes(admin.id)))
-          toast.success(`${selectedAdmins.length} admin berhasil dihapus!`)
-          break
-        case "export":
-          // Export functionality
-          const csvContent =
-            "data:text/csv;charset=utf-8," +
-            "Name,Email,Role,Status\n" +
-            selectedAdminData.map((admin) => `${admin.name},${admin.email},${admin.role},${admin.status}`).join("\n")
-
-          const encodedUri = encodeURI(csvContent)
-          const link = document.createElement("a")
-          link.setAttribute("href", encodedUri)
-          link.setAttribute("download", "admin_data.csv")
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-          toast.success("Data berhasil diekspor!")
-          break
+      if (action === "activate") {
+        await bulkUpdateStatus(selectedAdmins, "active")
+      } else if (action === "deactivate") {
+        await bulkUpdateStatus(selectedAdmins, "inactive")
+      } else if (action === "delete") {
+        await bulkDelete(selectedAdmins)
       }
-
       setSelectedAdmins([])
       setShowBulkModal(false)
     } catch (error) {
-      toast.error("Terjadi kesalahan!")
-    } finally {
-      setLoading(false)
+      console.error("Error performing bulk action:", error)
     }
   }
 
@@ -275,7 +197,7 @@ export default function AdminPage() {
           iconBg="bg-blue-100"
         />
 
-        <StatsCard
+        {/* <StatsCard
           title="Admin Aktif"
           value={admins.filter((a) => a.status === "active").length.toString()}
           change="0"
@@ -291,7 +213,7 @@ export default function AdminPage() {
           changeType="neutral"
           icon={<FaCrown className="text-yellow-600" />}
           iconBg="bg-yellow-100"
-        />
+        /> */}
 
         <StatsCard
           title="Role Tersedia"
@@ -406,19 +328,19 @@ export default function AdminPage() {
                   <td className="px-4 md:px-6 py-4 whitespace-nowrap">
                     <input
                       type="checkbox"
-                      checked={selectedAdmins.includes(admin.id)}
-                      onChange={(e) => handleSelectAdmin(admin.id, e.target.checked)}
+                      checked={selectedAdmins.includes(admin.id!)}
+                      onChange={(e) => handleSelectAdmin(admin.id!, e.target.checked)}
                       className="rounded border-gray-300 text-red-600 focus:ring-red-500"
                     />
                   </td>
                   <td className="px-4 md:px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="w-8 h-8 bg-red-900 rounded-full flex items-center justify-center mr-3">
-                        <span className="text-white text-xs font-semibold">{admin.avatar}</span>
+                        {/* <span className="text-white text-xs font-semibold">{admin.avatar}</span> */}
                       </div>
                       <div>
                         <div className="text-sm font-medium text-gray-900">{admin.name}</div>
-                        <div className="text-xs text-gray-500">{admin.phone}</div>
+                        {/* <div className="text-xs text-gray-500">{admin.phone}</div> */}
                       </div>
                     </div>
                   </td>
@@ -426,22 +348,22 @@ export default function AdminPage() {
                     <div className="text-sm text-gray-900">{admin.email}</div>
                   </td>
                   <td className="px-4 md:px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{admin.role}</div>
+                    {/* <div className="text-sm text-gray-900">{admin.role}</div> */}
                   </td>
                   <td className="px-4 md:px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{admin.permissions}</div>
+                    {/* <div className="text-sm text-gray-900">{admin.permissions}</div> */}
                   </td>
                   <td className="px-4 md:px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{admin.lastLogin}</div>
+                    {/* <div className="text-sm text-gray-500">{admin.lastLogin}</div> */}
                   </td>
                   <td className="px-4 md:px-6 py-4 whitespace-nowrap">
-                    <span
+                    {/* <span
                       className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                         admin.status === "active" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
                       }`}
                     >
                       {admin.status === "active" ? "Aktif" : "Tidak Aktif"}
-                    </span>
+                    </span> */}
                   </td>
                   <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
@@ -525,7 +447,7 @@ export default function AdminPage() {
       <BulkActionModal
         isOpen={showBulkModal}
         onClose={() => setShowBulkModal(false)}
-        selectedUsers={admins.filter((admin) => selectedAdmins.includes(admin.id))}
+        selectedUsers={admins.filter((admin) => selectedAdmins.includes(admin.id!))}
         onBulkAction={handleBulkAction}
         userType="admin"
       />

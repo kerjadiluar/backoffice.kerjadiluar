@@ -388,9 +388,8 @@ export default function KaryawanPage() {
         onClose={() => setShowModal(false)}
         mode={modalMode}
         title={modalMode === "create" ? "Tambah Karyawan" : "Edit Karyawan"}
-        fields={karyawanFields}
-        initialData={selectedEmployee}
-        onSubmit={(data) => {
+        userData={selectedEmployee}
+        onSave={(data) => {
           console.log("Submit:", data)
           setShowModal(false)
         }}
@@ -403,19 +402,20 @@ export default function KaryawanPage() {
           console.log("Delete:", selectedEmployee)
           setShowDeleteModal(false)
         }}
-        title="Hapus Karyawan"
-        message={`Apakah Anda yakin ingin menghapus karyawan "${selectedEmployee?.name}"?`}
+        userName={selectedEmployee?.name || ""}
+        userType="Karyawan"
       />
 
       <BulkActionModal
         isOpen={showBulkModal}
         onClose={() => setShowBulkModal(false)}
-        selectedCount={selectedEmployees.length}
+        selectedUsers={employees.filter((emp) => selectedEmployees.includes(emp.id))}
         onBulkAction={(action) => {
           console.log("Bulk action:", action, selectedEmployees)
           setShowBulkModal(false)
           setSelectedEmployees([])
         }}
+        userType="karyawan"
       />
     </>
   )

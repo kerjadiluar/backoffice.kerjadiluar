@@ -24,6 +24,7 @@ interface KaryawanModalProps {
   onSave: (userData: User) => void
   userData: User | null
   mode: "create" | "edit"
+  title?: string
 }
 
 // Rename interface to avoid conflicts
@@ -44,7 +45,7 @@ interface KaryawanFormData extends User {
   bpjs?: string
 }
 
-export default function KaryawanModal({ isOpen, onClose, onSave, userData, mode }: KaryawanModalProps) {
+export default function KaryawanModal({ isOpen, onClose, onSave, userData, mode, title }: KaryawanModalProps) {
   const [formData, setFormData] = useState<Partial<KaryawanData>>({
     name: "",
     email: "",
@@ -110,7 +111,7 @@ export default function KaryawanModal({ isOpen, onClose, onSave, userData, mode 
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{mode === "create" ? "Tambah Karyawan" : "Edit Karyawan"}</DialogTitle>
+          <DialogTitle>{title ?? (mode === "create" ? "Tambah Karyawan" : "Edit Karyawan")}</DialogTitle>
           <DialogDescription>
             {mode === "create" ? "Tambahkan karyawan baru ke sistem" : "Edit informasi karyawan"}
           </DialogDescription>

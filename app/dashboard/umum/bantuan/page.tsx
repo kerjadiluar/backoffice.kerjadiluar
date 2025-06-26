@@ -1,6 +1,7 @@
 import { FaLifeRing, FaPhoneAlt, FaExclamationTriangle, FaCheckCircle, FaEdit, FaTrash, FaEye, FaPlus } from "react-icons/fa"
 import PageHeader from "@/components/ui/PageHeader"
 import StatsCard from "@/components/ui/StatsCard"
+import Tooltip from "@/components/ui/Tooltip"
 
 export default function BantuanPage() {
   const emergencyCases = [
@@ -60,41 +61,46 @@ export default function BantuanPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
-        <StatsCard
-          title="Total Kasus"
-          value="45"
-          change="+3"
-          changeType="positive"
-          icon={<FaLifeRing className="text-red-600" />}
-          iconBg="bg-red-100"
-        />
-
-        <StatsCard
-          title="Kasus Aktif"
-          value="12"
-          change="+2"
-          changeType="positive"
-          icon={<FaExclamationTriangle className="text-yellow-600" />}
-          iconBg="bg-yellow-100"
-        />
-
-        <StatsCard
-          title="Terselesaikan"
-          value="28"
-          change="+5"
-          changeType="positive"
-          icon={<FaCheckCircle className="text-green-600" />}
-          iconBg="bg-green-100"
-        />
-
-        <StatsCard
-          title="Response Time"
-          value="15 min"
-          change="-5 min"
-          changeType="positive"
-          icon={<FaPhoneAlt className="text-blue-600" />}
-          iconBg="bg-blue-100"
-        />
+        <Tooltip content="Total kasus darurat yang tercatat dalam sistem.">
+          <StatsCard
+            title="Total Kasus"
+            value="45"
+            change="+3"
+            changeType="positive"
+            icon={<FaLifeRing className="text-red-600" />}
+            iconBg="bg-red-100"
+          />
+        </Tooltip>
+        <Tooltip content="Kasus darurat yang masih dalam penanganan.">
+          <StatsCard
+            title="Kasus Aktif"
+            value="12"
+            change="+2"
+            changeType="positive"
+            icon={<FaExclamationTriangle className="text-yellow-600" />}
+            iconBg="bg-yellow-100"
+          />
+        </Tooltip>
+        <Tooltip content="Kasus darurat yang sudah berhasil diselesaikan.">
+          <StatsCard
+            title="Terselesaikan"
+            value="28"
+            change="+5"
+            changeType="positive"
+            icon={<FaCheckCircle className="text-green-600" />}
+            iconBg="bg-green-100"
+          />
+        </Tooltip>
+        <Tooltip content="Rata-rata waktu respon tim bantuan terhadap kasus darurat.">
+          <StatsCard
+            title="Response Time"
+            value="15 min"
+            change="-5 min"
+            changeType="positive"
+            icon={<FaPhoneAlt className="text-blue-600" />}
+            iconBg="bg-blue-100"
+          />
+        </Tooltip>
       </div>
 
       {/* Emergency Contacts */}

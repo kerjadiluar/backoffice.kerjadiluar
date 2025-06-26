@@ -1,6 +1,7 @@
 import { FaNetworkWired, FaUsers, FaComments, FaCalendarAlt, FaEdit, FaTrash, FaEye, FaPlus } from "react-icons/fa"
 import PageHeader from "@/components/ui/PageHeader"
 import StatsCard from "@/components/ui/StatsCard"
+import Tooltip from "@/components/ui/Tooltip"
 
 export default function KomunitasPage() {
   const communities = [
@@ -60,41 +61,46 @@ export default function KomunitasPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
-        <StatsCard
-          title="Total Komunitas"
-          value="24"
-          change="+3"
-          changeType="positive"
-          icon={<FaNetworkWired className="text-blue-600" />}
-          iconBg="bg-blue-100"
-        />
-
-        <StatsCard
-          title="Total Anggota"
-          value="1,245"
-          change="+45"
-          changeType="positive"
-          icon={<FaUsers className="text-green-600" />}
-          iconBg="bg-green-100"
-        />
-
-        <StatsCard
-          title="Pesan Hari Ini"
-          value="156"
-          change="+23"
-          changeType="positive"
-          icon={<FaComments className="text-yellow-600" />}
-          iconBg="bg-yellow-100"
-        />
-
-        <StatsCard
-          title="Event Aktif"
-          value="8"
-          change="+2"
-          changeType="positive"
-          icon={<FaCalendarAlt className="text-purple-600" />}
-          iconBg="bg-purple-100"
-        />
+        <Tooltip content="Jumlah komunitas pekerja yang terdaftar.">
+          <StatsCard
+            title="Total Komunitas"
+            value="24"
+            change="+3"
+            changeType="positive"
+            icon={<FaNetworkWired className="text-blue-600" />}
+            iconBg="bg-blue-100"
+          />
+        </Tooltip>
+        <Tooltip content="Total anggota dari seluruh komunitas.">
+          <StatsCard
+            title="Total Anggota"
+            value="1,245"
+            change="+45"
+            changeType="positive"
+            icon={<FaUsers className="text-green-600" />}
+            iconBg="bg-green-100"
+          />
+        </Tooltip>
+        <Tooltip content="Jumlah pesan yang dikirim di komunitas hari ini.">
+          <StatsCard
+            title="Pesan Hari Ini"
+            value="156"
+            change="+23"
+            changeType="positive"
+            icon={<FaComments className="text-yellow-600" />}
+            iconBg="bg-yellow-100"
+          />
+        </Tooltip>
+        <Tooltip content="Jumlah event komunitas yang sedang berlangsung.">
+          <StatsCard
+            title="Event Aktif"
+            value="8"
+            change="+2"
+            changeType="positive"
+            icon={<FaCalendarAlt className="text-purple-600" />}
+            iconBg="bg-purple-100"
+          />
+        </Tooltip>
       </div>
 
       {/* Recent Activities */}

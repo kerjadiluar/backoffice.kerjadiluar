@@ -6,16 +6,29 @@ export interface AdminData {
   id?: string
   name: string
   email: string
-  phone: string
+  password: string
+  roleId: string
+}
+
+export interface CreateAdminRequest {
+  name: string
+  email: string
+  password: string
+  // password_confirmation: string
+  roleId: string
+}
+
+export interface UpdateAdminRequest {
+  name?: string
+  email?: string
+  phone?: string
   address?: string
-  role: string
-  permissions: string
-  department: string
-  accessLevel: string
+  role?: string
+  permissions?: string
+  department?: string
+  accessLevel?: string
   twoFactorEnabled?: boolean
-  status: "active" | "inactive"
-  password?: string
-  password_confirmation?: string
+  status?: "active" | "inactive"
 }
 
 export interface AdminListResponse {
@@ -34,9 +47,8 @@ class AdminService {
     search?: string
     status?: string
     role?: string
-    department?: string
-  }): Promise<ApiResponse<AdminListResponse>> {
-    return apiClient.get<AdminListResponse>(API_CONFIG.ENDPOINTS.ADMINS, params)
+  }): Promise<ApiResponse<AdminData[]>> {
+    return apiClient.get<AdminData[]>(API_CONFIG.ENDPOINTS.ADMINS, params)
   }
 
   // Get single admin by ID
@@ -45,17 +57,20 @@ class AdminService {
   }
 
   // Create new admin
-  async createAdmin(adminData: AdminData): Promise<ApiResponse<AdminData>> {
-    // Use the register endpoint for creating admin
+  async createAdmin(data: CreateAdminRequest): Promise<ApiResponse<AdminData>> {
     return apiClient.post<AdminData>(API_CONFIG.ENDPOINTS.USER_REGISTER, {
-      ...adminData,
-      user_type: "admin", // Specify user type
+      name: data.name,
+      email: data.email,
+      password: data.password,
+      // password_confirmation: data.password_confirmation,
+      roleId: "rl2",
+      // user_type: "admin"
     })
   }
 
   // Update admin
-  async updateAdmin(id: string, adminData: Partial<AdminData>): Promise<ApiResponse<AdminData>> {
-    return apiClient.put<AdminData>(API_CONFIG.ENDPOINTS.ADMIN_BY_ID(id), adminData)
+  async updateAdmin(id: string, data: UpdateAdminRequest): Promise<ApiResponse<AdminData>> {
+    return apiClient.put<AdminData>(API_CONFIG.ENDPOINTS.ADMIN_BY_ID(id), data)
   }
 
   // Delete admin
@@ -64,16 +79,16 @@ class AdminService {
   }
 
   // Bulk operations
-  async bulkUpdateAdmins(ids: string[], data: Partial<AdminData>): Promise<ApiResponse<void>> {
-    return apiClient.post<void>(`${API_CONFIG.ENDPOINTS.ADMINS}/bulk-update`, {
+  async bulkUpdateStatus(ids: string[], status: "active" | "inactive"): Promise<ApiResponse<void>> {
+    return apiClient.patch<void>(API_CONFIG.ENDPOINTS.ADMINS, {
       ids,
-      data,
+      status
     })
   }
 
-  async bulkDeleteAdmins(ids: string[]): Promise<ApiResponse<void>> {
+  async bulkDelete(ids: string[]): Promise<ApiResponse<void>> {
     return apiClient.post<void>(`${API_CONFIG.ENDPOINTS.ADMINS}/bulk-delete`, {
-      ids,
+      ids
     })
   }
 
@@ -86,7 +101,6 @@ class AdminService {
   async resetAdminPassword(id: string, newPassword: string): Promise<ApiResponse<void>> {
     return apiClient.post<void>(`${API_CONFIG.ENDPOINTS.ADMIN_BY_ID(id)}/reset-password`, {
       password: newPassword,
-      password_confirmation: newPassword,
     })
   }
 }

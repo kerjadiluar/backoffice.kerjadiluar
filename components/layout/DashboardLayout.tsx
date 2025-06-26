@@ -38,18 +38,19 @@ import {
 
 const utamaMenu = [
   { name: "Beranda", href: "/dashboard", icon: <FaHome /> },
+  { name: "1. Administrasi", href: "/dashboard/verifikasi/administrasi", icon: <FaUserShield /> },
+  { name: "2. Pelatihan", href: "/dashboard/verifikasi/pelatihan", icon: <FaChalkboardTeacher /> },
+  // {
+  //   name: "Verifikasi",
+  //   icon: <FaCheckCircle />,
+  //   children: [
+     
+  //     { name: "Keberangkatan", href: "/dashboard/verifikasi/keberangkatan", icon: <FaPlane /> },
+  //     { name: "Kepulangan", href: "/dashboard/verifikasi/kepulangan", icon: <FaHotel /> },
+  //   ],
+  // },
   {
-    name: "Verifikasi",
-    icon: <FaCheckCircle />,
-    children: [
-      { name: "Administrasi", href: "/dashboard/verifikasi/administrasi", icon: <FaUserShield /> },
-      { name: "Pelatihan", href: "/dashboard/verifikasi/pelatihan", icon: <FaChalkboardTeacher /> },
-      { name: "Keberangkatan", href: "/dashboard/verifikasi/keberangkatan", icon: <FaPlane /> },
-      { name: "Kepulangan", href: "/dashboard/verifikasi/kepulangan", icon: <FaHotel /> },
-    ],
-  },
-  {
-    name: "User Management",
+    name: "3. User Management",
     icon: <FaUsers />,
     children: [
       { name: "Admin", href: "/dashboard/user/admin", icon: <FaUserShield /> },
@@ -60,20 +61,18 @@ const utamaMenu = [
       { name: "Pengguna", href: "/dashboard/user/pengguna", icon: <FaUserFriends /> },
     ],
   },
+  { name: "4. Pemasaran & Rekrutmen", href: "/dashboard/umum/pemasaran", icon: <FaBullhorn /> },
+  { name: "5. Tes & Sertifikasi", href: "/dashboard/umum/tes", icon: <FaCertificate /> },
+  { name: "6. Visa & Izin", href: "/dashboard/umum/visa", icon: <FaPassport /> },
+  { name: "7. Perjalanan & Asuransi", href: "/dashboard/umum/perjalanan", icon: <FaPlane /> },
+  { name: "8. Onboarding & Residensi", href: "/dashboard/umum/onboarding", icon: <FaHotel /> },
+  { name: "9. Orientasi Kerja", href: "/dashboard/umum/orientasi", icon: <FaBookOpen /> },
+  { name: "10. Pembiayaan", href: "/dashboard/umum/pembiayaan", icon: <FaMoneyBill /> },
+  { name: "11. Manajemen Kontrak", href: "/dashboard/umum/kontrak", icon: <FaFileContract /> },
+  { name: "12. Manajemen Komunitas", href: "/dashboard/umum/komunitas", icon: <FaNetworkWired /> },
+  { name: "13. Bantuan Darurat", href: "/dashboard/umum/bantuan", icon: <FaLifeRing /> },
 ]
 
-const umumMenu = [
-  { name: "Pemasaran & Rekrutmen", href: "/dashboard/umum/pemasaran", icon: <FaBullhorn /> },
-  { name: "Tes & Sertifikasi", href: "/dashboard/umum/tes", icon: <FaCertificate /> },
-  { name: "Visa & Izin", href: "/dashboard/umum/visa", icon: <FaPassport /> },
-  { name: "Perjalanan & Asuransi", href: "/dashboard/umum/perjalanan", icon: <FaPlane /> },
-  { name: "Onboarding & Residensi", href: "/dashboard/umum/onboarding", icon: <FaHotel /> },
-  { name: "Orientasi Kerja", href: "/dashboard/umum/orientasi", icon: <FaBookOpen /> },
-  { name: "Pembiayaan", href: "/dashboard/umum/pembiayaan", icon: <FaMoneyBill /> },
-  { name: "Manajemen Kontrak", href: "/dashboard/umum/kontrak", icon: <FaFileContract /> },
-  { name: "Manajemen Komunitas", href: "/dashboard/umum/komunitas", icon: <FaNetworkWired /> },
-  { name: "Bantuan Darurat", href: "/dashboard/umum/bantuan", icon: <FaLifeRing /> },
-]
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -294,7 +293,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
 
           {/* General Section */}
-          <div className="mb-4">
+          {/* <div className="mb-4">
             {(!sidebarCollapsed || isMobile) && (
               <p className="uppercase text-xs font-semibold text-red-200 px-3 mb-3 tracking-wider">Menu Umum</p>
             )}
@@ -321,7 +320,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </Link>
               </div>
             ))}
-          </div>
+          </div> */}
         </nav>
 
         {/* Sidebar Footer */}

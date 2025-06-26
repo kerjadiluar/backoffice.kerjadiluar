@@ -1,6 +1,7 @@
 import { FaCertificate, FaUsers, FaClipboardList, FaTrophy, FaEdit, FaTrash, FaEye, FaPlus } from "react-icons/fa"
 import PageHeader from "@/components/ui/PageHeader"
 import StatsCard from "@/components/ui/StatsCard"
+import Tooltip from "@/components/ui/Tooltip"
 
 export default function TesPage() {
   const tests = [
@@ -47,41 +48,46 @@ export default function TesPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
-        <StatsCard
-          title="Total Tes"
-          value="24"
-          change="+3"
-          changeType="positive"
-          icon={<FaClipboardList className="text-blue-600" />}
-          iconBg="bg-blue-100"
-        />
-
-        <StatsCard
-          title="Peserta Bulan Ini"
-          value="156"
-          change="+12"
-          changeType="positive"
-          icon={<FaUsers className="text-green-600" />}
-          iconBg="bg-green-100"
-        />
-
-        <StatsCard
-          title="Sertifikat Diterbitkan"
-          value="89"
-          change="+8"
-          changeType="positive"
-          icon={<FaCertificate className="text-yellow-600" />}
-          iconBg="bg-yellow-100"
-        />
-
-        <StatsCard
-          title="Tingkat Kelulusan"
-          value="85%"
-          change="+3%"
-          changeType="positive"
-          icon={<FaTrophy className="text-purple-600" />}
-          iconBg="bg-purple-100"
-        />
+        <Tooltip content="Jumlah tes/ujian yang tersedia.">
+          <StatsCard
+            title="Total Tes"
+            value="24"
+            change="+3"
+            changeType="positive"
+            icon={<FaClipboardList className="text-blue-600" />}
+            iconBg="bg-blue-100"
+          />
+        </Tooltip>
+        <Tooltip content="Jumlah peserta tes pada bulan ini.">
+          <StatsCard
+            title="Peserta Bulan Ini"
+            value="156"
+            change="+12"
+            changeType="positive"
+            icon={<FaUsers className="text-green-600" />}
+            iconBg="bg-green-100"
+          />
+        </Tooltip>
+        <Tooltip content="Jumlah sertifikat yang telah diterbitkan dari tes.">
+          <StatsCard
+            title="Sertifikat Diterbitkan"
+            value="89"
+            change="+8"
+            changeType="positive"
+            icon={<FaCertificate className="text-yellow-600" />}
+            iconBg="bg-yellow-100"
+          />
+        </Tooltip>
+        <Tooltip content="Persentase peserta yang lulus dari seluruh tes.">
+          <StatsCard
+            title="Tingkat Kelulusan"
+            value="85%"
+            change="+3%"
+            changeType="positive"
+            icon={<FaTrophy className="text-purple-600" />}
+            iconBg="bg-purple-100"
+          />
+        </Tooltip>
       </div>
 
       {/* Tests Table */}

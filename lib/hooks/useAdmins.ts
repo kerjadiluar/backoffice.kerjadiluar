@@ -1,151 +1,245 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { adminService, type AdminData } from "../services/admin-service"
+import { useState, useEffect, useCallback } from "react"
+import { adminService, type AdminData, type CreateAdminRequest } from "@/lib/services/admin-service"
+import { type ApiResponse } from "@/lib/api-clients"
 import { toast } from "sonner"
 
 interface UseAdminsOptions {
+  initialLoad?: boolean
   page?: number
-  per_page?: number
-  search?: string
-  status?: string
-  role?: string
-  department?: string
+  perPage?: number
 }
 
 export function useAdmins(options: UseAdminsOptions = {}) {
+  const { initialLoad = true, page = 1, perPage = 10 } = options
+  
   const [admins, setAdmins] = useState<AdminData[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [pagination, setPagination] = useState({
+    currentPage: page,
+    perPage,
     total: 0,
-    page: 1,
-    per_page: 10,
-    last_page: 1,
+    lastPage: 1
   })
 
-  const fetchAdmins = async () => {
+  // Load admins
+  const loadAdmins = useCallback(async (params?: {
+    page?: number
+    per_page?: number
+    search?: string
+    status?: string
+    role?: string
+  }) => {
+    setLoading(true)
+    setError(null)
+    
     try {
-      setLoading(true)
-      setError(null)
-
-      const response = await adminService.getAdmins(options)
-
+      const response = await adminService.getAdmins({
+        page: params?.page || pagination.currentPage,
+        per_page: params?.per_page || pagination.perPage,
+        search: params?.search,
+        status: params?.status,
+        role: params?.role
+      })
+      
       if (response.success && response.data) {
-        setAdmins(response.data.admins)
-        setPagination({
-          total: response.data.total,
-          page: response.data.page,
-          per_page: response.data.per_page,
-          last_page: response.data.last_page,
-        })
+        setAdmins(response.data)
+        
+        // Update pagination if meta data is available
+        if (response.meta) {
+          setPagination(prev => ({
+            ...prev,
+            currentPage: response.meta!.page,
+            perPage: response.meta!.per_page,
+            total: response.meta!.total,
+            lastPage: response.meta!.last_page
+          }))
+        }
       } else {
-        throw new Error(response.message || "Failed to fetch admins")
+        throw new Error(response.message || "Gagal memuat data admin")
       }
     } catch (err: any) {
-      setError(err.message)
-      toast.error("Gagal memuat data admin: " + err.message)
+      if (err.response) {
+        // The request was made and the server responded with a status code
+        console.error("Error loading admins:", err.response.data);
+        setError(err.response.data.message || "Terjadi kesalahan saat memuat data");
+      } else if (err.request) {
+        // The request was made but no response was received
+        console.error("Error loading admins: No response received", err.request);
+        setError("Tidak ada respons dari server");
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        // console.error("Error loading admins:", err.message);
+        setError(err.message || "Terjadi kesalahan saat memuat data");
+      }
+      toast.error(err.message || "Terjadi kesalahan saat memuat data");
+    }
+     finally {
+      setLoading(false)
+    }
+  }, [pagination.currentPage, pagination.perPage])
+
+  // Create admin
+  const createAdmin = useCallback(async (adminData: CreateAdminRequest): Promise<ApiResponse<AdminData>> => {
+    setLoading(true)
+    setError(null)
+    
+    try {
+      const response = await adminService.createAdmin(adminData)
+      
+      if (response.success && response.data) {
+        const newAdmin = {
+          ...response.data,
+          avatar: response.data.name
+            ?.split(" ")
+            .map((n: string) => n[0])
+            .join("")
+            .substring(0, 2) || "AD",
+          lastLogin: "Never",
+        }
+        setAdmins(prev => [...prev, newAdmin])
+        toast.success("Admin berhasil ditambahkan!")
+        return response
+      } else {
+        throw new Error(response.message || "Gagal menambahkan admin")
+      }
+    } catch (err: any) {
+      console.error("Error creating admin:", err)
+      setError(err.message || "Terjadi kesalahan saat menambahkan admin")
+      toast.error(err.message || "Terjadi kesalahan saat menambahkan admin")
+      throw err
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
-  const createAdmin = async (adminData: AdminData) => {
-    try {
-      const response = await adminService.createAdmin(adminData)
-
-      if (response.success) {
-        toast.success("Admin berhasil ditambahkan!")
-        await fetchAdmins() // Refresh data
-        return response.data
-      } else {
-        throw new Error(response.message || "Failed to create admin")
-      }
-    } catch (err: any) {
-      toast.error("Gagal menambah admin: " + err.message)
-      throw err
-    }
-  }
-
-  const updateAdmin = async (id: string, adminData: Partial<AdminData>) => {
+  // Update admin
+  const updateAdmin = useCallback(async (id: string, adminData: Partial<AdminData>): Promise<ApiResponse<AdminData>> => {
+    setLoading(true)
+    setError(null)
+    
     try {
       const response = await adminService.updateAdmin(id, adminData)
-
-      if (response.success) {
+      
+      if (response.success && response.data) {
+        setAdmins(prev => prev.map(admin => 
+          admin.id === id ? { ...admin, ...response.data } : admin
+        ))
         toast.success("Admin berhasil diperbarui!")
-        await fetchAdmins() // Refresh data
-        return response.data
+        return response
       } else {
-        throw new Error(response.message || "Failed to update admin")
+        throw new Error(response.message || "Gagal memperbarui admin")
       }
     } catch (err: any) {
-      toast.error("Gagal memperbarui admin: " + err.message)
+      console.error("Error updating admin:", err)
+      setError(err.message || "Terjadi kesalahan saat memperbarui admin")
+      toast.error(err.message || "Terjadi kesalahan saat memperbarui admin")
       throw err
+    } finally {
+      setLoading(false)
     }
-  }
+  }, [])
 
-  const deleteAdmin = async (id: string) => {
+  // Delete admin
+  const deleteAdmin = useCallback(async (id: string) => {
+    setLoading(true)
+    setError(null)
+    
     try {
       const response = await adminService.deleteAdmin(id)
-
+      
       if (response.success) {
+        setAdmins(prev => prev.filter(admin => admin.id !== id))
         toast.success("Admin berhasil dihapus!")
-        await fetchAdmins() // Refresh data
       } else {
-        throw new Error(response.message || "Failed to delete admin")
+        throw new Error(response.message || "Gagal menghapus admin")
       }
     } catch (err: any) {
-      toast.error("Gagal menghapus admin: " + err.message)
+      console.error("Error deleting admin:", err)
+      setError(err.message || "Terjadi kesalahan saat menghapus admin")
+      toast.error(err.message || "Terjadi kesalahan saat menghapus admin")
       throw err
+    } finally {
+      setLoading(false)
     }
-  }
+  }, [])
 
-  const bulkUpdateAdmins = async (ids: string[], data: Partial<AdminData>) => {
+  // Bulk operations
+  const bulkUpdateStatus = useCallback(async (ids: string[], status: "active" | "inactive") => {
+    setLoading(true)
+    setError(null)
+    
     try {
-      const response = await adminService.bulkUpdateAdmins(ids, data)
-
+      const response = await adminService.bulkUpdateStatus(ids, status)
+      
       if (response.success) {
-        toast.success(`${ids.length} admin berhasil diperbarui!`)
-        await fetchAdmins() // Refresh data
+        setAdmins(prev => prev.map(admin =>
+          ids.includes(admin.id!) ? { ...admin, status } : admin
+        ))
+        toast.success(`Admin berhasil ${status === 'active' ? 'diaktifkan' : 'dinonaktifkan'}!`)
       } else {
-        throw new Error(response.message || "Failed to bulk update admins")
+        throw new Error(response.message || "Gagal memperbarui status admin")
       }
     } catch (err: any) {
-      toast.error("Gagal memperbarui admin: " + err.message)
+      console.error("Error bulk updating status:", err)
+      setError(err.message || "Terjadi kesalahan saat memperbarui status")
+      toast.error(err.message || "Terjadi kesalahan saat memperbarui status")
       throw err
+    } finally {
+      setLoading(false)
     }
-  }
+  }, [])
 
-  const bulkDeleteAdmins = async (ids: string[]) => {
+  const bulkDelete = useCallback(async (ids: string[]) => {
+    setLoading(true)
+    setError(null)
+    
     try {
-      const response = await adminService.bulkDeleteAdmins(ids)
-
+      const response = await adminService.bulkDelete(ids)
+      
       if (response.success) {
-        toast.success(`${ids.length} admin berhasil dihapus!`)
-        await fetchAdmins() // Refresh data
+        setAdmins(prev => prev.filter(admin => !ids.includes(admin.id!)))
+        toast.success("Admin berhasil dihapus!")
       } else {
-        throw new Error(response.message || "Failed to bulk delete admins")
+        throw new Error(response.message || "Gagal menghapus admin")
       }
     } catch (err: any) {
-      toast.error("Gagal menghapus admin: " + err.message)
+      console.error("Error bulk deleting:", err)
+      setError(err.message || "Terjadi kesalahan saat menghapus admin")
+      toast.error(err.message || "Terjadi kesalahan saat menghapus admin")
       throw err
+    } finally {
+      setLoading(false)
     }
-  }
+  }, [])
 
+  // Change page
+  const changePage = useCallback((newPage: number) => {
+    setPagination(prev => ({ ...prev, currentPage: newPage }))
+    loadAdmins({ page: newPage })
+  }, [loadAdmins])
+
+  // Initial load
   useEffect(() => {
-    fetchAdmins()
-  }, [options.page, options.per_page, options.search, options.status, options.role, options.department])
+    if (initialLoad) {
+      loadAdmins()
+    }
+  }, [initialLoad, loadAdmins])
 
   return {
     admins,
     loading,
     error,
     pagination,
-    refetch: fetchAdmins,
+    loadAdmins,
     createAdmin,
     updateAdmin,
     deleteAdmin,
-    bulkUpdateAdmins,
-    bulkDeleteAdmins,
+    bulkUpdateStatus,
+    bulkDelete,
+    changePage,
+    setError
   }
 }

@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa"
 import PageHeader from "@/components/ui/PageHeader"
 import StatsCard from "@/components/ui/StatsCard"
+import Tooltip from "@/components/ui/Tooltip"
 
 export default function PembiayaanPage() {
   const financialRecords = [
@@ -114,41 +115,46 @@ export default function PembiayaanPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
-        <StatsCard
-          title="Total Pendapatan"
-          value="Rp 245M"
-          change="+15%"
-          changeType="positive"
-          icon={<FaMoneyBill className="text-green-600" />}
-          iconBg="bg-green-100"
-        />
-
-        <StatsCard
-          title="Tagihan Pending"
-          value="Rp 45M"
-          change="+8%"
-          changeType="positive"
-          icon={<FaFileInvoice className="text-yellow-600" />}
-          iconBg="bg-yellow-100"
-        />
-
-        <StatsCard
-          title="Pembayaran Bulan Ini"
-          value="Rp 89M"
-          change="+12%"
-          changeType="positive"
-          icon={<FaCreditCard className="text-blue-600" />}
-          iconBg="bg-blue-100"
-        />
-
-        <StatsCard
-          title="Tunggakan"
-          value="Rp 12M"
-          change="-5%"
-          changeType="negative"
-          icon={<FaChartLine className="text-red-600" />}
-          iconBg="bg-red-100"
-        />
+        <Tooltip content="Total pendapatan yang diterima dari seluruh pembayaran.">
+          <StatsCard
+            title="Total Pendapatan"
+            value="Rp 245M"
+            change="+15%"
+            changeType="positive"
+            icon={<FaMoneyBill className="text-green-600" />}
+            iconBg="bg-green-100"
+          />
+        </Tooltip>
+        <Tooltip content="Total tagihan yang masih menunggu pembayaran.">
+          <StatsCard
+            title="Tagihan Pending"
+            value="Rp 45M"
+            change="+8%"
+            changeType="positive"
+            icon={<FaFileInvoice className="text-yellow-600" />}
+            iconBg="bg-yellow-100"
+          />
+        </Tooltip>
+        <Tooltip content="Total pembayaran yang diterima bulan ini.">
+          <StatsCard
+            title="Pembayaran Bulan Ini"
+            value="Rp 89M"
+            change="+12%"
+            changeType="positive"
+            icon={<FaCreditCard className="text-blue-600" />}
+            iconBg="bg-blue-100"
+          />
+        </Tooltip>
+        <Tooltip content="Total tagihan yang belum dibayar (tunggakan).">
+          <StatsCard
+            title="Tunggakan"
+            value="Rp 12M"
+            change="-5%"
+            changeType="negative"
+            icon={<FaChartLine className="text-red-600" />}
+            iconBg="bg-red-100"
+          />
+        </Tooltip>
       </div>
 
       {/* Payment Plans & Recent Transactions */}

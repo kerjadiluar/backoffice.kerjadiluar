@@ -1,6 +1,7 @@
 import { FaUserShield, FaFileAlt, FaCheck, FaTimes, FaEye } from "react-icons/fa"
 import PageHeader from "@/components/ui/PageHeader"
 import StatsCard from "@/components/ui/StatsCard"
+import Tooltip from "@/components/ui/Tooltip"
 
 export default function AdministrasiPage() {
   const pendingDocuments = [
@@ -23,41 +24,46 @@ export default function AdministrasiPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
-        <StatsCard
-          title="Total Dokumen"
-          value="1,247"
-          change="+5%"
-          changeType="positive"
-          icon={<FaFileAlt className="text-blue-600" />}
-          iconBg="bg-blue-100"
-        />
-
-        <StatsCard
-          title="Menunggu Verifikasi"
-          value="89"
-          change="+12%"
-          changeType="positive"
-          icon={<FaUserShield className="text-yellow-600" />}
-          iconBg="bg-yellow-100"
-        />
-
-        <StatsCard
-          title="Terverifikasi"
-          value="1,098"
-          change="+8%"
-          changeType="positive"
-          icon={<FaCheck className="text-green-600" />}
-          iconBg="bg-green-100"
-        />
-
-        <StatsCard
-          title="Ditolak"
-          value="60"
-          change="-15%"
-          changeType="negative"
-          icon={<FaTimes className="text-red-600" />}
-          iconBg="bg-red-100"
-        />
+        <Tooltip content="Total dokumen administrasi yang masuk ke sistem.">
+          <StatsCard
+            title="Total Dokumen"
+            value="1,247"
+            change="+5%"
+            changeType="positive"
+            icon={<FaFileAlt className="text-blue-600" />}
+            iconBg="bg-blue-100"
+          />
+        </Tooltip>
+        <Tooltip content="Jumlah dokumen yang masih menunggu proses verifikasi.">
+          <StatsCard
+            title="Menunggu Verifikasi"
+            value="89"
+            change="+12%"
+            changeType="positive"
+            icon={<FaUserShield className="text-yellow-600" />}
+            iconBg="bg-yellow-100"
+          />
+        </Tooltip>
+        <Tooltip content="Jumlah dokumen yang sudah diverifikasi dan disetujui.">
+          <StatsCard
+            title="Terverifikasi"
+            value="1,098"
+            change="+8%"
+            changeType="positive"
+            icon={<FaCheck className="text-green-600" />}
+            iconBg="bg-green-100"
+          />
+        </Tooltip>
+        <Tooltip content="Jumlah dokumen yang ditolak setelah proses verifikasi.">
+          <StatsCard
+            title="Ditolak"
+            value="60"
+            change="-15%"
+            changeType="negative"
+            icon={<FaTimes className="text-red-600" />}
+            iconBg="bg-red-100"
+          />
+        </Tooltip>
       </div>
 
       {/* Pending Documents Table */}

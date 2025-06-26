@@ -1,6 +1,7 @@
 import { FaPlane, FaShieldAlt, FaMapMarkerAlt, FaCalendarAlt, FaEdit, FaTrash, FaEye, FaPlus } from "react-icons/fa"
 import PageHeader from "@/components/ui/PageHeader"
 import StatsCard from "@/components/ui/StatsCard"
+import Tooltip from "@/components/ui/Tooltip"
 
 export default function PerjalananPage() {
   const travelRecords = [
@@ -110,41 +111,46 @@ export default function PerjalananPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
-        <StatsCard
-          title="Total Perjalanan"
-          value="156"
-          change="+12"
-          changeType="positive"
-          icon={<FaPlane className="text-blue-600" />}
-          iconBg="bg-blue-100"
-        />
-
-        <StatsCard
-          title="Asuransi Aktif"
-          value="142"
-          change="+8"
-          changeType="positive"
-          icon={<FaShieldAlt className="text-green-600" />}
-          iconBg="bg-green-100"
-        />
-
-        <StatsCard
-          title="Perjalanan Bulan Ini"
-          value="24"
-          change="+6"
-          changeType="positive"
-          icon={<FaCalendarAlt className="text-yellow-600" />}
-          iconBg="bg-yellow-100"
-        />
-
-        <StatsCard
-          title="Destinasi Aktif"
-          value="8"
-          change="+1"
-          changeType="positive"
-          icon={<FaMapMarkerAlt className="text-purple-600" />}
-          iconBg="bg-purple-100"
-        />
+        <Tooltip content="Jumlah perjalanan yang tercatat dalam sistem.">
+          <StatsCard
+            title="Total Perjalanan"
+            value="156"
+            change="+12"
+            changeType="positive"
+            icon={<FaPlane className="text-blue-600" />}
+            iconBg="bg-blue-100"
+          />
+        </Tooltip>
+        <Tooltip content="Jumlah polis asuransi perjalanan yang masih aktif.">
+          <StatsCard
+            title="Asuransi Aktif"
+            value="142"
+            change="+8"
+            changeType="positive"
+            icon={<FaShieldAlt className="text-green-600" />}
+            iconBg="bg-green-100"
+          />
+        </Tooltip>
+        <Tooltip content="Jumlah perjalanan yang dilakukan bulan ini.">
+          <StatsCard
+            title="Perjalanan Bulan Ini"
+            value="24"
+            change="+6"
+            changeType="positive"
+            icon={<FaCalendarAlt className="text-yellow-600" />}
+            iconBg="bg-yellow-100"
+          />
+        </Tooltip>
+        <Tooltip content="Jumlah destinasi perjalanan yang sedang aktif.">
+          <StatsCard
+            title="Destinasi Aktif"
+            value="8"
+            change="+1"
+            changeType="positive"
+            icon={<FaMapMarkerAlt className="text-purple-600" />}
+            iconBg="bg-purple-100"
+          />
+        </Tooltip>
       </div>
 
       {/* Insurance Types & Upcoming Trips */}

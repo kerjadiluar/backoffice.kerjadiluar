@@ -1,6 +1,7 @@
 import { FaChalkboardTeacher, FaUsers, FaCalendarAlt, FaCertificate } from "react-icons/fa"
 import PageHeader from "@/components/ui/PageHeader"
 import StatsCard from "@/components/ui/StatsCard"
+import Tooltip from "@/components/ui/Tooltip"
 
 export default function PelatihanPage() {
   const trainingSchedule = [
@@ -48,41 +49,46 @@ export default function PelatihanPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
-        <StatsCard
-          title="Total Pelatihan"
-          value="156"
-          change="+8%"
-          changeType="positive"
-          icon={<FaChalkboardTeacher className="text-blue-600" />}
-          iconBg="bg-blue-100"
-        />
-
-        <StatsCard
-          title="Peserta Aktif"
-          value="342"
-          change="+15%"
-          changeType="positive"
-          icon={<FaUsers className="text-green-600" />}
-          iconBg="bg-green-100"
-        />
-
-        <StatsCard
-          title="Jadwal Bulan Ini"
-          value="24"
-          change="+5%"
-          changeType="positive"
-          icon={<FaCalendarAlt className="text-yellow-600" />}
-          iconBg="bg-yellow-100"
-        />
-
-        <StatsCard
-          title="Sertifikat Diterbitkan"
-          value="289"
-          change="+12%"
-          changeType="positive"
-          icon={<FaCertificate className="text-purple-600" />}
-          iconBg="bg-purple-100"
-        />
+        <Tooltip content="Jumlah total program pelatihan yang tersedia.">
+          <StatsCard
+            title="Total Pelatihan"
+            value="156"
+            change="+8%"
+            changeType="positive"
+            icon={<FaChalkboardTeacher className="text-blue-600" />}
+            iconBg="bg-blue-100"
+          />
+        </Tooltip>
+        <Tooltip content="Jumlah peserta aktif yang mengikuti pelatihan.">
+          <StatsCard
+            title="Peserta Aktif"
+            value="342"
+            change="+15%"
+            changeType="positive"
+            icon={<FaUsers className="text-green-600" />}
+            iconBg="bg-green-100"
+          />
+        </Tooltip>
+        <Tooltip content="Jumlah jadwal pelatihan yang berlangsung bulan ini.">
+          <StatsCard
+            title="Jadwal Bulan Ini"
+            value="24"
+            change="+5%"
+            changeType="positive"
+            icon={<FaCalendarAlt className="text-yellow-600" />}
+            iconBg="bg-yellow-100"
+          />
+        </Tooltip>
+        <Tooltip content="Jumlah sertifikat yang telah diterbitkan dari pelatihan.">
+          <StatsCard
+            title="Sertifikat Diterbitkan"
+            value="289"
+            change="+12%"
+            changeType="positive"
+            icon={<FaCertificate className="text-purple-600" />}
+            iconBg="bg-purple-100"
+          />
+        </Tooltip>
       </div>
 
       {/* Training Schedule */}

@@ -21,6 +21,14 @@ import UserModal from "../components/modals/PengajarModal"
 import DeleteModal from "../components/DeleteModal"
 import BulkActionModal from "../components/BulkActionModal"
 
+type CustomLegendProps = {
+  className?: string
+  hideIcon?: boolean
+  nameKey?: string
+  payload?: any[]
+  verticalAlign?: "top" | "bottom" | "middle"
+}
+
 export default function PengajarPage() {
   const [showModal, setShowModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -394,10 +402,8 @@ export default function PengajarPage() {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         mode={modalMode}
-        title={modalMode === "create" ? "Tambah Pengajar" : "Edit Pengajar"}
-        fields={pengajarFields}
-        initialData={selectedTeacher}
-        onSubmit={(data) => {
+        userData={selectedTeacher}
+        onSave={(data) => {
           console.log("Submit:", data)
           setShowModal(false)
         }}
@@ -410,19 +416,20 @@ export default function PengajarPage() {
           console.log("Delete:", selectedTeacher)
           setShowDeleteModal(false)
         }}
-        title="Hapus Pengajar"
-        message={`Apakah Anda yakin ingin menghapus pengajar "${selectedTeacher?.name}"?`}
+        userName={selectedTeacher?.name || ""}
+        userType="Pengajar"
       />
 
       <BulkActionModal
         isOpen={showBulkModal}
         onClose={() => setShowBulkModal(false)}
-        selectedCount={selectedTeachers.length}
+        selectedUsers={[]}
         onBulkAction={(action) => {
           console.log("Bulk action:", action, selectedTeachers)
           setShowBulkModal(false)
           setSelectedTeachers([])
         }}
+        userType="pengajar"
       />
     </>
   )
